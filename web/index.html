@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS — AI Agent Orchestration Platform</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:#0a0a0f;color:#e0e0e0;font-family:'Courier New',monospace;overflow-x:hidden}
+
+/* SCANLINES */
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.15) 2px,rgba(0,0,0,0.15) 4px);pointer-events:none;z-index:9999}
+
+/* NEON GRID BG */
+.grid-bg{position:fixed;top:0;left:0;width:100%;height:100%;background:
+  linear-gradient(rgba(0,255,245,0.03) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(0,255,245,0.03) 1px,transparent 1px),
+  linear-gradient(rgba(255,0,255,0.02) 1px,transparent 1px),
+  linear-gradient(90deg,rgba(255,0,255,0.02) 1px,transparent 1px);
+  background-size:100px 100px,100px 100px,20px 20px,20px 20px;z-index:0}
+
+.grid-bg::after{content:'';position:absolute;top:0;left:0;width:100%;height:200%;background:linear-gradient(180deg,transparent 0%,rgba(0,255,245,0.02) 50%,transparent 100%);animation:gridMove 8s linear infinite}
+@keyframes gridMove{0%{transform:translateY(0)}100%{transform:translateY(-50%)}}
+
+/* NAV */
+nav{position:fixed;top:0;width:100%;padding:20px 40px;display:flex;justify-content:space-between;align-items:center;z-index:100;background:rgba(10,10,15,0.9);border-bottom:1px solid rgba(0,255,245,0.2);backdrop-filter:blur(10px)}
+nav .logo{font-size:1.4rem;font-weight:bold;color:#00fff5;text-shadow:0 0 10px #00fff5,0 0 20px #00fff5}
+nav .logo span{color:#ff00ff;text-shadow:0 0 10px #ff00ff,0 0 20px #ff00ff}
+nav a{color:#888;text-decoration:none;margin-left:30px;font-size:.9rem;transition:all .3s}
+nav a:hover{color:#00fff5;text-shadow:0 0 8px #00fff5}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;position:relative;z-index:10;padding:0 20px}
+
+/* GLITCH */
+.glitch{font-size:clamp(3rem,8vw,7rem);font-weight:900;color:#fff;position:relative;text-shadow:0 0 10px rgba(0,255,245,0.5)}
+.glitch::before,.glitch::after{content:attr(data-text);position:absolute;top:0;left:0;width:100%;height:100%}
+.glitch::before{color:#ff00ff;z-index:-1;animation:glitch1 3s infinite}
+.glitch::after{color:#00fff5;z-index:-2;animation:glitch2 2s infinite}
+@keyframes glitch1{0%,90%,100%{clip-path:inset(0 0 0 0);transform:translate(0)}92%{clip-path:inset(20% 0 40% 0);transform:translate(-4px,2px)}94%{clip-path:inset(60% 0 10% 0);transform:translate(4px,-2px)}96%{clip-path:inset(30% 0 50% 0);transform:translate(-2px,4px)}98%{clip-path:inset(70% 0 5% 0);transform:translate(2px,-4px)}}
+@keyframes glitch2{0%,88%,100%{clip-path:inset(0 0 0 0);transform:translate(0)}90%{clip-path:inset(40% 0 20% 0);transform:translate(4px,-2px)}93%{clip-path:inset(10% 0 60% 0);transform:translate(-4px,2px)}95%{clip-path:inset(50% 0 30% 0);transform:translate(2px,4px)}97%{clip-path:inset(5% 0 70% 0);transform:translate(-2px,-4px)}}
+
+.hero p{font-size:1.3rem;color:#888;margin-top:20px;max-width:600px;line-height:1.6}
+.hero .tagline{color:#ff00ff;font-weight:bold}
+.cta-btn{display:inline-block;margin-top:40px;padding:16px 48px;font-size:1.1rem;font-family:'Courier New',monospace;background:transparent;color:#00fff5;border:2px solid #00fff5;text-decoration:none;position:relative;overflow:hidden;transition:all .3s;cursor:pointer}
+.cta-btn:hover{background:#00fff5;color:#0a0a0f;box-shadow:0 0 30px rgba(0,255,245,0.5),inset 0 0 30px rgba(0,255,245,0.1)}
+
+/* STATS */
+.stats{display:flex;justify-content:center;gap:60px;padding:80px 20px;position:relative;z-index:10;flex-wrap:wrap}
+.stat{text-align:center}
+.stat .num{font-size:3rem;font-weight:900;color:#00fff5;text-shadow:0 0 20px rgba(0,255,245,0.5)}
+.stat .label{color:#666;margin-top:8px;font-size:.9rem;text-transform:uppercase;letter-spacing:2px}
+.stat:nth-child(2) .num{color:#ff00ff;text-shadow:0 0 20px rgba(255,0,255,0.5)}
+.stat:nth-child(3) .num{color:#00fff5;text-shadow:0 0 20px rgba(0,255,245,0.5)}
+
+/* DIVIDER */
+.divider{width:80%;max-width:600px;height:1px;background:linear-gradient(90deg,transparent,#00fff5,#ff00ff,transparent);margin:0 auto;position:relative;z-index:10}
+
+/* TERMINAL */
+.terminal-section{padding:80px 20px;position:relative;z-index:10;display:flex;justify-content:center}
+.terminal{max-width:700px;width:100%;background:rgba(10,10,15,0.95);border:1px solid rgba(0,255,245,0.3);border-radius:8px;overflow:hidden;box-shadow:0 0 40px rgba(0,255,245,0.1)}
+.terminal-header{padding:12px 16px;background:rgba(0,255,245,0.05);border-bottom:1px solid rgba(0,255,245,0.2);display:flex;align-items:center;gap:8px}
+.dot{width:12px;height:12px;border-radius:50%}
+.dot.r{background:#ff3b3b}.dot.y{background:#ffcc00}.dot.g{background:#00ff66}
+.terminal-title{color:#666;margin-left:10px;font-size:.8rem}
+.terminal-body{padding:24px;font-size:.9rem;line-height:1.8}
+.terminal-body .prompt{color:#00fff5}.terminal-body .cmd{color:#fff}.terminal-body .out{color:#888}.terminal-body .ok{color:#00ff66}.terminal-body .accent{color:#ff00ff}
+
+/* FEATURES */
+.features{padding:80px 20px;position:relative;z-index:10}
+.features h2{text-align:center;font-size:2.2rem;color:#fff;margin-bottom:60px}
+.features h2 span{color:#ff00ff;text-shadow:0 0 10px #ff00ff}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:30px;max-width:1100px;margin:0 auto}
+.feature-card{background:rgba(10,10,15,0.8);border:1px solid rgba(0,255,245,0.15);padding:32px;border-radius:4px;transition:all .3s;position:relative;overflow:hidden}
+.feature-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:2px;background:linear-gradient(90deg,#00fff5,#ff00ff);transform:scaleX(0);transition:transform .3s;transform-origin:left}
+.feature-card:hover{border-color:#00fff5;box-shadow:0 0 30px rgba(0,255,245,0.1);transform:translateY(-4px)}
+.feature-card:hover::before{transform:scaleX(1)}
+.feature-card h3{color:#00fff5;font-size:1.2rem;margin-bottom:12px;text-shadow:0 0 5px rgba(0,255,245,0.3)}
+.feature-card p{color:#777;line-height:1.6;font-size:.9rem}
+
+/* FOOTER */
+footer{text-align:center;padding:40px;position:relative;z-index:10;border-top:1px solid rgba(0,255,245,0.1);color:#444;font-size:.85rem}
+footer span{color:#00fff5}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  nav{padding:15px 20px}
+  nav a{margin-left:15px;font-size:.8rem}
+  .stats{gap:30px}
+  .stat .num{font-size:2rem}
+  .features-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<nav>
+  <div class="logo">NEX<span>US</span></div>
+  <div>
+    <a href="#features">Features</a>
+    <a href="#demo">Demo</a>
+    <a href="https://github.com/galinaplinoel-stack/nexus">GitHub</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="glitch" data-text="NEXUS">NEXUS</div>
+  <p><span class="tagline">⚡ Route. Scale. Orchestrate. ⚡</span><br>AI Agent Orchestration Platform that manages multiple agents, routes tasks intelligently, and auto-scales to demand.</p>
+  <a href="#demo" class="cta-btn">INITIALIZE SYSTEM →</a>
+</section>
+
+<section class="stats">
+  <div class="stat"><div class="num">50+</div><div class="label">Agent Types</div></div>
+  <div class="stat"><div class="num">&lt;1ms</div><div class="label">Real-time Orchestration</div></div>
+  <div class="stat"><div class="num">100%</div><div class="label">Zero Downtime</div></div>
+</section>
+
+<div class="divider"></div>
+
+<section class="terminal-section" id="demo">
+  <div class="terminal">
+    <div class="terminal-header">
+      <div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+      <span class="terminal-title">nexus — bash</span>
+    </div>
+    <div class="terminal-body">
+      <span class="prompt">$ </span><span class="cmd">python main.py</span><br>
+      <span class="out">==================================================</span><br>
+      <span class="out">&nbsp;&nbsp;NEXUS - AI Agent Orchestration Platform</span><br>
+      <span class="out">==================================================</span><br><br>
+      <span class="ok">✓ Initialized 3 agents</span><br>
+      <span class="ok">✓ Orchestrator ready with 3 routes</span><br>
+      <span class="ok">✓ System ready</span><br><br>
+      <span class="prompt">$ </span><span class="cmd">python cli.py submit "analyze sentiment data"</span><br>
+      <span class="accent">Task submitted: analyze sentiment data</span><br>
+      <span class="out">Routed to: agent-0 (general)</span><br><br>
+      <span class="prompt">$ </span><span class="cmd">python cli.py agents</span><br>
+      <span class="out">Agent ID&nbsp;&nbsp;&nbsp;&nbsp;| Name&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| Status | Tasks</span><br>
+      <span class="out">------------------------------------------------</span><br>
+      <span class="ok">a1b2c3d4&nbsp;&nbsp;&nbsp;&nbsp;| agent-0&nbsp;&nbsp;&nbsp;| idle&nbsp;&nbsp;&nbsp;| 1</span><br>
+      <span class="ok">e5f6g7h8&nbsp;&nbsp;&nbsp;&nbsp;| agent-1&nbsp;&nbsp;&nbsp;| idle&nbsp;&nbsp;&nbsp;| 0</span><br>
+      <span class="ok">i9j0k1l2&nbsp;&nbsp;&nbsp;&nbsp;| agent-2&nbsp;&nbsp;&nbsp;| idle&nbsp;&nbsp;&nbsp;| 0</span><br><br>
+      <span class="prompt">$ </span><span class="cmd">█</span>
+    </div>
+  </div>
+</section>
+
+<section class="features" id="features">
+  <h2>Core <span>Modules</span></h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <h3>▸ Agent Pool</h3>
+      <p>Dynamic agent lifecycle management. Create, destroy, and manage agent instances with configurable concurrency limits and resource allocation.</p>
+    </div>
+    <div class="feature-card">
+      <h3>▸ Task Routing</h3>
+      <p>Intelligent task distribution based on agent type, current load, and priority. Routes tasks to the optimal agent in sub-millisecond time.</p>
+    </div>
+    <div class="feature-card">
+      <h3>▸ Load Balancing</h3>
+      <p>Even workload distribution across the agent pool. Prevents bottlenecks by monitoring active tasks per agent and rebalancing dynamically.</p>
+    </div>
+    <div class="feature-card">
+      <h3>▸ Health Monitoring</h3>
+      <p>Real-time health checks for all agents. Tracks status, completion rates, failure counts, and active task counts per agent instance.</p>
+    </div>
+    <div class="feature-card">
+      <h3>▸ Auto-scaling</h3>
+      <p>Automatically scales the agent pool based on demand. Spins up new agents when idle capacity drops and tears down idle agents to save resources.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span>NEXUS</span> — AI Agent Orchestration Platform — Built with Python
+</footer>
+</body>
+</html>
